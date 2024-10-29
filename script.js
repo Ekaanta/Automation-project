@@ -1,14 +1,32 @@
-const { Builder, By, Key, until } = require('selenium-webdriver');
-(async function example() {
-  let driver = await new Builder().forBrowser('chrome').build();
+const { Builder, By, until } = require('selenium-webdriver');
+
+(async function loginTest() {
+   driver = await new Builder().forBrowser('chrome').build();
+
   try {
-    await driver.get('http://www.google.com');
-    await driver.findElement(By.name('q')).sendKeys('Selenium', Key.RETURN);
-    await driver.wait(until.titleIs('Selenium - Google Search'), 100000);  // 10 seconds
-    // Keep browser open for 60 seconds
-    await new Promise(resolve => setTimeout(resolve, 60000));
+    await driver.get('https://www.saucedemo.com/');
+
+    await driver.findElement(By.id('user-name')).sendKeys('locked_out_user');
+    await driver.findElement(By.id('password')).sendKeys('secret_sauce');
+
+    await driver.findElement(By.id('login-button')).click();
+
+     errorElement = await driver.wait(
+      until.elementLocated(By.css('[data-test="error"]')),
+      5000 
+    );
+
+     errorMessage = await errorElement.getText();
+    const expectedMessage = "Epic sadface: Sorry, this user has been locked out.";
+
+    if (errorMessage === expectedMessage) {
+      console.log('Test Passed: Correct error message displayed.');
+    } else {
+      console.log(`Test Failed: Unexpected error message - '${errorMessage}'`);
+    }
+  } catch (error) {
+    console.error('Test encountered an error:', error);
   } finally {
     await driver.quit();
   }
 })();
-
